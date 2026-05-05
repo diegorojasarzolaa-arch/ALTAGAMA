@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repuestos Disponibles — Altagama</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f0f2f5;padding:20px}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.top-bar h1{font-size:1.4rem;color:#1a1a2e;flex:1;text-align:center}
+#btn-save{background:#16a34a;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:.85rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.subtitle{text-align:center;color:#555;font-size:.83rem;margin-bottom:10px;line-height:2}
+.search-wrap{display:flex;justify-content:center;margin-bottom:8px}
+#search{width:100%;max-width:600px;padding:10px 14px;border:2px solid #2563eb;border-radius:8px;font-size:1rem;outline:none}
+.hint{text-align:center;color:#888;font-size:.76rem;margin-bottom:10px}
+#count{text-align:center;color:#555;font-size:.83rem;margin-bottom:14px}
+.loading{text-align:center;padding:40px;color:#888;font-size:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px}
+.card{background:#1a1a2e;color:#fff;border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card-text{font-size:.82rem;font-weight:bold;letter-spacing:.03em;line-height:1.4;flex:1}
+.btn-group{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.btn-auto,.btn-msg1,.btn-msg2,.btn-pub,.btn-edit{border:none;border-radius:6px;padding:6px 11px;font-size:.73rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s,transform .1s}
+.btn-auto{background:#2563eb;color:#fff}.btn-msg1{background:#f59e0b;color:#000}.btn-msg2{background:#a855f7;color:#fff}
+.btn-pub{background:#6b7280;color:#fff}.btn-pub.published{background:#2563eb;color:#fff}
+.btn-edit{background:#1e2230;color:#9ca3af;border:1px solid #2a2f40}
+.btn-auto.ok,.btn-msg1.ok,.btn-msg2.ok{background:#16a34a!important;color:#fff!important}
+.btn-edit:hover{background:#2a2f40}
+.hidden{display:none}
+mark{background:#fbbf24;color:#000;border-radius:2px;padding:0 1px}
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.mb{background:#161920;border:1px solid #2a2f40;border-radius:14px;padding:24px;width:100%;max-width:460px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.mb h2{font-size:1.1rem;font-weight:700;color:#3b82f6;margin-bottom:16px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:.72rem;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.field input{width:100%;background:#0d0f14;border:1px solid #2a2f40;border-radius:7px;padding:8px 11px;color:#e8eaf0;font-family:Arial,sans-serif;font-size:.88rem;outline:none}
+.field input:focus{border-color:#3b82f6}
+.mo-actions{display:flex;gap:9px;margin-top:18px;justify-content:flex-end}
+.mo-btn{padding:8px 16px;border-radius:8px;border:none;font-size:.85rem;font-weight:700;cursor:pointer}
+.mo-cancel{background:#1e2230;color:#e8eaf0;border:1px solid #2a2f40}
+.mo-save{background:#3b82f6;color:#fff}
+.toast{position:fixed;bottom:20px;right:20px;background:#22c55e;color:#fff;padding:10px 16px;border-radius:9px;font-size:.83rem;font-weight:600;opacity:0;transform:translateY(8px);transition:all .25s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}.toast.err{background:#ef4444}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <div style="width:110px"></div>
+  <h1>📦 Repuestos Disponibles</h1>
+  <button id="btn-save" onclick="savePublished()">💾 Guardar</button>
+</div>
+<p class="subtitle">
+  <span style="background:#2563eb;color:#fff;padding:2px 8px;border-radius:4px;font-size:.75rem">🚗 Auto</span> solo repuesto &nbsp;|&nbsp;
+  <span style="background:#f59e0b;color:#000;padding:2px 8px;border-radius:4px;font-size:.75rem">📢 ...4136</span> +56950074136 &nbsp;|&nbsp;
+  <span style="background:#a855f7;color:#fff;padding:2px 8px;border-radius:4px;font-size:.75rem">📢 ...0120</span> +56950080120
+</p>
+<div class="search-wrap">
+  <input type="text" id="search" placeholder="Ej: foco honda 2022  /  espejo jeep  /  manilla bmw" oninput="filterCards()">
+</div>
+<p class="hint">💡 Escribe varias palabras separadas: <strong>alternador ford 2020</strong></p>
+<p id="count"></p>
+<div id="loading" class="loading">⏳ Cargando repuestos desde la nube...</div>
+<div class="grid" id="grid"></div>
+
+<!-- MODAL EDITAR -->
+<div class="mo" id="modal">
+  <div class="mb">
+    <h2>✏️ Editar Repuesto</h2>
+    <div class="field"><label>Repuesto</label><input type="text" id="e-repuesto"></div>
+    <div class="field"><label>Marca</label><input type="text" id="e-marca"></div>
+    <div class="field"><label>Modelo</label><input type="text" id="e-modelo"></div>
+    <div class="field"><label>Año</label><input type="text" id="e-anio"></div>
+    <div class="field"><label>N° Auto</label><input type="text" id="e-nauto"></div>
+    <div class="mo-actions">
+      <button class="mo-btn mo-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="mo-btn mo-save" onclick="saveEdit()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="tst"></div>
+
+<script>
+var SB_URL = "https://ihxcmkjibtfpybvuuucf.supabase.co";
+var SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImloeGNta2ppYnRmcHlidnV1dWNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDI3MzMsImV4cCI6MjA5MzQ3ODczM30.A9sxW0TWNU-t4Y15ty5PWDQlJHf_FJANzQPCozhBk5U";
+var FOOTER1 = "DISPONIBLE EN STOCK!!!\n\nEN DESARMADURIA ALTAGAMA REPUESTOS\nREPUESTOS USADOS GARANTIZADOS\n\nCOTIZA CON NOSOTROS , EMPRESA REGISTRADA CONFIABLE CON LOCAL ESTABLECIDO.\n\nESTAMOS EN AV 10 DE JULIO #1064\nDESARMADURIA ALTAGAMA REPUESTOS\n\nCOTIZACION INMEDIATA +56950074136\nwww.altagamarepuestos.cl\n\n#repuestosautos #desarmaduria #bmw #jeep #audi #dodge #ford #mini #volvo #nfiniti #lexus #porsche #mercedes_benz #honda #chrysler #renault #opel #land_rover #volkswagen #desarmaduria10dejulio #repuestos #repuestosoriginales";
+var FOOTER2 = "DISPONIBLE EN STOCK!!!\n\nEN DESARMADURIA ALTAGAMA REPUESTOS\nREPUESTOS USADOS GARANTIZADOS\n\nCOTIZA CON NOSOTROS , EMPRESA REGISTRADA CONFIABLE CON LOCAL ESTABLECIDO.\n\nESTAMOS EN AV 10 DE JULIO #1064\nDESARMADURIA ALTAGAMA REPUESTOS\n\nCOTIZACION INMEDIATA +56950080120\nwww.altagamarepuestos.cl\n\n#repuestosautos #desarmaduria #bmw #jeep #audi #dodge #ford #mini #volvo #nfiniti #lexus #porsche #mercedes_benz #honda #chrysler #renault #opel #land_rover #volkswagen #desarmaduria10dejulio #repuestos #repuestosoriginales";
+var ALL_ITEMS = [];
+var LABELS = [];
+var editingId = null;
+
+async function loadData() {
+  var all = [], from = 0, limit = 1000;
+  while(true) {
+    var resp = await fetch(SB_URL+'/rest/v1/repuestos?disponible=eq.true&select=id,repuesto,marca,modelo,anio,n_auto,publicado&order=repuesto.asc&limit='+limit+'&offset='+from, {
+      headers: {'apikey': SB_KEY, 'Authorization': 'Bearer '+SB_KEY}
+    });
+    var data = await resp.json();
+    if(!data.length) break;
+    all = all.concat(data);
+    if(data.length < limit) break;
+    from += limit;
+  }
+  ALL_ITEMS = all;
+  LABELS = all.map(function(i){
+    return [i.repuesto,i.marca,i.modelo,i.anio,i.n_auto].filter(Boolean).join(' ');
+  });
+  document.getElementById('loading').style.display='none';
+  document.getElementById('count').textContent = ALL_ITEMS.length + ' repuestos disponibles';
+  renderAll();
+}
+
+function renderAll() {
+  var grid = document.getElementById('grid');
+  var html = '';
+  ALL_ITEMS.forEach(function(item, idx) {
+    var label = LABELS[idx] || '';
+    var le = label.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var pubCls = item.publicado ? 'published' : '';
+    var pubTxt = item.publicado ? '📌 Publicado' : '📤 Sin publicar';
+    html += '<div class="card" data-id="'+item.id+'">'
+      +'<span class="card-text">'+le+'</span>'
+      +'<div class="btn-group">'
+      +'<button class="btn-auto" onclick="copyIdx(this,'+idx+',0)">🚗 Auto</button>'
+      +'<button class="btn-msg1" onclick="copyIdx(this,'+idx+',1)">📢 ...4136</button>'
+      +'<button class="btn-msg2" onclick="copyIdx(this,'+idx+',2)">📢 ...0120</button>'
+      +'<button class="btn-pub '+pubCls+'" onclick="togPub(this,'+item.id+')">'+pubTxt+'</button>'
+      +'<button class="btn-edit" onclick="openEdit('+item.id+')">✏️ Editar</button>'
+      +'</div></div>';
+  });
+  grid.innerHTML = html;
+}
+
+function openEdit(id) {
+  var item = ALL_ITEMS.find(function(x){return x.id===id;});
+  if(!item) return;
+  editingId = id;
+  document.getElementById('e-repuesto').value = item.repuesto || '';
+  document.getElementById('e-marca').value    = item.marca    || '';
+  document.getElementById('e-modelo').value   = item.modelo   || '';
+  document.getElementById('e-anio').value     = item.anio     || '';
+  document.getElementById('e-nauto').value    = item.n_auto   || '';
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('e-repuesto').focus();
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  editingId = null;
+}
+
+async function saveEdit() {
+  if(!editingId) return;
+  var nd = {
+    repuesto: document.getElementById('e-repuesto').value.trim().toUpperCase(),
+    marca:    document.getElementById('e-marca').value.trim().toUpperCase(),
+    modelo:   document.getElementById('e-modelo').value.trim().toUpperCase(),
+    anio:     document.getElementById('e-anio').value.trim(),
+    n_auto:   document.getElementById('e-nauto').value.trim().toUpperCase()
+  };
+  if(!nd.repuesto) { toast('El repuesto es obligatorio', true); return; }
+
+  var btn = document.querySelector('.mo-save');
+  btn.textContent = 'Guardando...'; btn.disabled = true;
+
+  var resp = await fetch(SB_URL+'/rest/v1/repuestos?id=eq.'+editingId, {
+    method: 'PATCH',
+    headers: {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body: JSON.stringify(nd)
+  });
+
+  btn.textContent = '💾 Guardar'; btn.disabled = false;
+
+  if(resp.ok) {
+    // Update local data
+    var item = ALL_ITEMS.find(function(x){return x.id===editingId;});
+    Object.assign(item, nd);
+    // Update label
+    var idx = ALL_ITEMS.indexOf(item);
+    LABELS[idx] = [item.repuesto,item.marca,item.modelo,item.anio,item.n_auto].filter(Boolean).join(' ');
+    closeModal();
+    renderAll();
+    filterCards();
+    toast('✅ Actualizado correctamente');
+  } else {
+    toast('Error al guardar', true);
+  }
+}
+
+function filterCards() {
+  var raw = document.getElementById('search').value.toLowerCase().trim();
+  var words = raw.length===0 ? [] : raw.split(' ').filter(function(w){return w.length>0;});
+  var cards = document.querySelectorAll('.card');
+  var visible = 0;
+  cards.forEach(function(c, i) {
+    if(!LABELS[i]){c.classList.add('hidden');return;}
+    var text = LABELS[i].toLowerCase();
+    var match = words.length===0 || words.every(function(w){return text.indexOf(w)>=0;});
+    c.classList.toggle('hidden', !match);
+    if(match) {
+      visible++;
+      if(words.length>0) {
+        var hl = LABELS[i];
+        words.forEach(function(w) {
+          var idx2=0,res='',lo=hl.toLowerCase();
+          while(idx2<hl.length) {
+            var found=lo.indexOf(w,idx2);
+            if(found===-1){res+=hl.slice(idx2);break;}
+            res+=hl.slice(idx2,found)+'<mark>'+hl.slice(found,found+w.length)+'</mark>';
+            idx2=found+w.length;
+          }
+          hl=res;
+        });
+        c.querySelector('.card-text').innerHTML=hl;
+      } else {
+        c.querySelector('.card-text').textContent=LABELS[i];
+      }
+    }
+  });
+  document.getElementById('count').textContent = visible + ' repuestos encontrados';
+}
+
+var pendingPub = {};
+function togPub(btn, id) {
+  var published = btn.classList.contains('published');
+  if(published) { btn.classList.remove('published'); btn.textContent='📤 Sin publicar'; pendingPub[id]=false; }
+  else { btn.classList.add('published'); btn.textContent='📌 Publicado'; pendingPub[id]=true; }
+  var s=document.getElementById('btn-save');
+  s.style.background='#f59e0b';s.style.color='#000';s.textContent='💾 Guardar cambios';
+}
+
+async function savePublished() {
+  var ids = Object.keys(pendingPub);
+  if(ids.length===0){alert('No hay cambios que guardar');return;}
+  var s=document.getElementById('btn-save');
+  s.textContent='Guardando...';s.disabled=true;
+  var errors=0;
+  for(var i=0;i<ids.length;i++) {
+    var resp=await fetch(SB_URL+'/rest/v1/repuestos?id=eq.'+ids[i],{
+      method:'PATCH',
+      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({publicado:pendingPub[ids[i]]})
+    });
+    if(!resp.ok) errors++;
+  }
+  pendingPub={};s.disabled=false;
+  if(errors===0){s.style.background='#16a34a';s.style.color='#fff';s.textContent='✅ Guardado!';setTimeout(function(){s.textContent='💾 Guardar';},2000);}
+  else{s.style.background='#ef4444';s.style.color='#fff';s.textContent='⚠ Error';}
+}
+
+function copyIdx(btn,idx,tipo) {
+  var label = LABELS[idx] || '';
+  var text = tipo===0 ? label : tipo===1 ? FOOTER1 : FOOTER2;
+  var orig=btn.textContent;
+  function done(){btn.textContent='✅ Copiado!';btn.classList.add('ok');setTimeout(function(){btn.textContent=orig;btn.classList.remove('ok');},1800);}
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(done).catch(function(){fallback(text);done();});}
+  else{fallback(text);done();}
+}
+
+function fallback(text) {
+  var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);
+}
+
+function toast(msg,err) {
+  var t=document.getElementById('tst');t.textContent=msg;t.className='toast show'+(err?' err':'');
+  clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2500);
+}
+
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===e.currentTarget)closeModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+
+loadData();
+</script>
+</body></html>
