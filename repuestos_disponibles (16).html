@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Altagama Repuestos</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --surface: #11141a;
+  --surface2: #181c25;
+  --border: #1e2433;
+  --accent: #e8372a;
+  --blue: #2563eb;
+  --gold: #f59e0b;
+  --purple: #8b5cf6;
+  --green: #16a34a;
+  --red: #dc2626;
+  --orange: #f59e0b;
+  --text: #e8eaf0;
+  --muted: #6b7280;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* HEADER */
+.header {
+  background: var(--surface);
+  border-bottom: 2px solid var(--accent);
+  padding: 0 20px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+}
+.header-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; align-items: center; gap: 16px; height: 64px;
+}
+.logo-block { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.logo-icon { width: 40px; height: 40px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+.logo-text strong { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 1.1rem; letter-spacing: 0.04em; text-transform: uppercase; color: #fff; display: block; }
+.logo-text span { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+.header-search { flex: 1; max-width: 500px; margin: 0 auto; }
+.header-search input {
+  width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 9px 14px; color: var(--text);
+  font-family: 'Barlow', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+}
+.header-search input:focus { border-color: var(--accent); }
+.header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.hbtn {
+  display: flex; align-items: center; gap: 6px; padding: 8px 13px;
+  border-radius: 8px; border: none;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.hbtn-primary { background: var(--accent); color: #fff; }
+.hbtn-primary:hover { background: #c62d22; }
+.hbtn-import { background: var(--blue); color: #fff; }
+.hbtn-import:hover { background: #1d4ed8; }
+.hbtn-history { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+.hbtn-history:hover { color: var(--gold); border-color: var(--gold); }
+
+/* TABS */
+.tabs-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+}
+.tabs-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; align-items: center; gap: 4px;
+}
+.tab {
+  padding: 12px 18px; border: none; background: transparent;
+  color: var(--muted); font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; font-size: 0.85rem; letter-spacing: 0.06em;
+  text-transform: uppercase; cursor: pointer; transition: all 0.15s;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  display: flex; align-items: center; gap: 7px;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: #fff; border-bottom-color: var(--accent); }
+.tab .badge {
+  font-size: 0.68rem; padding: 1px 6px; border-radius: 10px;
+  font-weight: 700; background: var(--surface2);
+}
+.tab.active .badge { background: var(--accent); color: #fff; }
+.tab-green.active { border-bottom-color: var(--green); }
+.tab-green.active .badge { background: var(--green); }
+.tab-red.active { border-bottom-color: var(--red); }
+.tab-red.active .badge { background: var(--red); }
+.tab-orange.active { border-bottom-color: var(--orange); }
+.tab-orange.active .badge { background: var(--orange); color: #000; }
+
+/* STATS */
+.stats-bar { background: var(--surface2); border-bottom: 1px solid var(--border); padding: 8px 20px; }
+.stats-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.stat { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; }
+.stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.stat-dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.stat-dot.red { background: var(--red); }
+.stat-dot.orange { background: var(--orange); }
+.stat-label { color: var(--muted); }
+.stat-val { font-weight: 600; color: var(--text); }
+.search-hint { margin-left: auto; color: var(--muted); font-size: 0.75rem; font-style: italic; }
+
+/* GRID */
+.main { padding: 16px 20px 40px; max-width: 1400px; margin: 0 auto; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.loading { text-align: center; padding: 60px; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-size: 1.2rem; letter-spacing: 0.1em; }
+.spinner { display: inline-block; width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 10px; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* CARD */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 13px 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: border-color 0.2s, transform 0.1s;
+  position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px; border-radius: 3px 0 0 3px; transition: background 0.2s;
+}
+.card-available::before { background: var(--green); }
+.card-sold::before { background: var(--red); }
+.card-published::before { background: var(--orange); }
+.card:hover { border-color: #2a2f3f; transform: translateY(-1px); }
+.card-sold { opacity: 0.7; }
+.card-text {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 0.95rem; letter-spacing: 0.04em; line-height: 1.3; color: #fff; flex: 1;
+}
+.card-status-badge {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 2px 6px; border-radius: 4px; flex-shrink: 0; align-self: flex-start;
+}
+.badge-available { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.3); }
+.badge-sold { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid rgba(220,38,38,0.3); }
+.badge-published { background: rgba(245,158,11,0.15); color: var(--orange); border: 1px solid rgba(245,158,11,0.3); }
+.card-header { display: flex; align-items: flex-start; gap: 8px; }
+.card-meta { font-size: 0.72rem; color: var(--muted); }
+
+/* BUTTONS */
+.btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+.abtn {
+  border: none; border-radius: 6px; padding: 7px 5px;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap; text-align: center;
+}
+.abtn-blue { background: rgba(37,99,235,0.15); color: #60a5fa; border: 1px solid rgba(37,99,235,0.3); }
+.abtn-blue:hover { background: var(--blue); color: #fff; }
+.abtn-gold { background: rgba(245,158,11,0.12); color: var(--gold); border: 1px solid rgba(245,158,11,0.3); }
+.abtn-gold:hover { background: var(--gold); color: #000; }
+.abtn-purple { background: rgba(139,92,246,0.12); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+.abtn-purple:hover { background: var(--purple); color: #fff; }
+.abtn-sold { background: rgba(220,38,38,0.1); color: #f87171; border: 1px solid rgba(220,38,38,0.3); }
+.abtn-sold:hover { background: var(--red); color: #fff; }
+.abtn-edit { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.abtn-edit:hover { border-color: var(--muted); color: var(--text); }
+.abtn-pub { background: rgba(245,158,11,0.1); color: var(--orange); border: 1px solid rgba(245,158,11,0.3); }
+.abtn-pub:hover { background: var(--orange); color: #000; }
+.abtn-unpub { background: rgba(107,114,128,0.1); color: var(--muted); border: 1px solid var(--border); }
+.abtn-unpub:hover { background: var(--surface2); color: var(--text); }
+.abtn.ok { background: var(--green) !important; color: #fff !important; }
+mark { background: rgba(232,55,42,0.3); color: #fca5a5; border-radius: 2px; padding: 0 1px; }
+
+/* SOLD META */
+.card-sold-meta { font-size: 0.72rem; color: #f87171; display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* MODAL */
+.modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85); z-index: 300;
+  align-items: flex-start; justify-content: center;
+  padding: 20px; overflow-y: auto; backdrop-filter: blur(4px);
+}
+.modal.open { display: flex; }
+.modal-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px; width: 100%; max-width: 480px;
+  margin: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+  animation: slideUp 0.2s ease;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-title {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
+  font-size: 1.2rem; letter-spacing: 0.04em; text-transform: uppercase;
+  margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+}
+.modal-title.green { color: #4ade80; }
+.modal-title.blue { color: #60a5fa; }
+.modal-title.red { color: #f87171; }
+.modal-title.amber { color: var(--gold); }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 0.68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+.field input { width: 100%; background: var(--bg); border: 1.5px solid var(--border); border-radius: 7px; padding: 10px 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+.field input:focus { border-color: var(--blue); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-actions { display: flex; gap: 8px; margin-top: 20px; }
+.mbtn { flex: 1; padding: 11px; border-radius: 8px; border: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
+.mbtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.mbtn-cancel { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.mbtn-green { background: var(--green); color: #fff; }
+.mbtn-blue { background: var(--blue); color: #fff; }
+.mbtn-red { background: var(--red); color: #fff; }
+.sold-preview { background: rgba(220,38,38,0.08); border: 1px solid rgba(220,38,38,0.25); border-radius: 8px; padding: 12px; margin: 12px 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 1rem; color: #f87171; letter-spacing: 0.03em; }
+
+/* HISTORY */
+.history-list { max-height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.history-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 0.82rem; }
+.history-item-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.92rem; color: #fff; margin-bottom: 4px; }
+.history-item-meta { color: var(--muted); font-size: 0.73rem; display: flex; gap: 10px; flex-wrap: wrap; }
+.history-empty { text-align: center; padding: 30px; color: var(--muted); font-size: 0.85rem; }
+.tab-bar-inner { display: flex; gap: 4px; margin-bottom: 16px; background: var(--bg); border-radius: 8px; padding: 4px; }
+.tab-btn-sm { flex: 1; padding: 7px; border: none; border-radius: 6px; background: transparent; color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
+.tab-btn-sm.active { background: var(--surface2); color: var(--text); }
+
+/* IMPORT */
+.import-drop { border: 2px dashed var(--border); border-radius: 10px; padding: 28px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 14px; }
+.import-drop:hover, .import-drop.drag { border-color: var(--blue); background: rgba(37,99,235,0.05); }
+.import-drop .drop-icon { font-size: 2rem; margin-bottom: 8px; }
+.import-drop p { color: var(--muted); font-size: 0.85rem; }
+.import-drop strong { color: var(--text); }
+.import-preview { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 0.78rem; color: var(--muted); max-height: 150px; overflow-y: auto; margin-bottom: 12px; display: none; }
+.import-preview.show { display: block; }
+.import-preview .row { padding: 3px 0; border-bottom: 1px solid var(--border); }
+.import-preview .row:last-child { border: none; }
+.import-progress { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-bottom: 10px; display: none; }
+.import-progress.show { display: block; }
+.import-bar { height: 100%; background: var(--blue); transition: width 0.3s; border-radius: 2px; width: 0%; }
+.import-status { font-size: 0.8rem; color: var(--muted); text-align: center; margin-bottom: 8px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 20px; right: 16px; background: var(--green); color: #fff; padding: 12px 18px; border-radius: 10px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.04em; opacity: 0; transform: translateY(10px); transition: all 0.25s; z-index: 999; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,0.4); max-width: calc(100vw - 32px); }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.err { background: var(--red); }
+
+/* EMPTY */
+.empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.4; }
+.hidden { display: none !important; }
+
+@media (max-width: 600px) {
+  .header-inner { gap: 8px; height: 56px; }
+  .logo-text span { display: none; }
+  .hbtn .label { display: none; }
+  .hbtn { padding: 8px 10px; }
+  .main { padding: 12px; }
+  .btn-group { grid-template-columns: 1fr 1fr 1fr; }
+  .tab { padding: 10px 10px; font-size: 0.75rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-block">
+      <div class="logo-icon">🔧</div>
+      <div class="logo-text">
+        <strong>Altagama</strong>
+        <span>Repuestos · Av 10 de Julio</span>
+      </div>
+    </div>
+    <div class="header-search">
+      <input type="text" id="search" placeholder="Buscar: honda civic 2020, foco jeep..." oninput="filterCards()">
+    </div>
+    <div class="header-actions">
+      <button class="hbtn hbtn-history" onclick="openHistory()">📋 <span class="label">Vendidos</span></button>
+      <button class="hbtn hbtn-import" onclick="openImport()">📂 <span class="label">Importar</span></button>
+      <button class="hbtn hbtn-primary" onclick="openAdd()">➕ <span class="label">Agregar</span></button>
+    </div>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <button class="tab tab-green active" id="tab-disponibles" onclick="setTab('disponibles')">
+      ✅ Disponibles <span class="badge" id="badge-disponibles">—</span>
+    </button>
+    <button class="tab tab-orange" id="tab-publicados" onclick="setTab('publicados')">
+      📢 Publicados <span class="badge" id="badge-publicados">—</span>
+    </button>
+    <button class="tab tab-red" id="tab-vendidos" onclick="setTab('vendidos')">
+      🔴 Vendidos <span class="badge" id="badge-vendidos">—</span>
+    </button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat"><div class="stat-dot green"></div><span class="stat-label">Disponibles:</span><span class="stat-val" id="st-available">—</span></div>
+    <span style="color:var(--border)">·</span>
+    <div class="stat"><div class="stat-dot orange"></div><span class="stat-label">Publicados:</span><span class="stat-val" id="st-published">—</span></div>
+    <span style="color:var(--border)">·</span>
+    <div class="stat"><div class="stat-dot red"></div><span class="stat-label">Vendidos hoy:</span><span class="stat-val" id="st-sold-today">—</span></div>
+    <span class="search-hint" id="count"></span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+  <div id="loading" class="loading"><span class="spinner"></span>Cargando inventario...</div>
+  <div class="grid" id="grid"></div>
+  <div class="empty hidden" id="empty">
+    <div class="empty-icon">🔍</div>
+    <p>No se encontraron repuestos en esta vista</p>
+  </div>
+</main>
+
+<!-- MODAL: ADD -->
+<div class="modal" id="modal-add">
+  <div class="modal-box">
+    <div class="modal-title green">➕ Agregar Repuesto</div>
+    <div class="field"><label>Repuesto *</label><input type="text" id="a-repuesto" placeholder="Ej: FOCO IZQUIERDO"></div>
+    <div class="field-row">
+      <div class="field"><label>Marca *</label><input type="text" id="a-marca" placeholder="Ej: HONDA"></div>
+      <div class="field"><label>Modelo *</label><input type="text" id="a-modelo" placeholder="Ej: CR-V"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Año</label><input type="text" id="a-anio" placeholder="Ej: 2022"></div>
+      <div class="field"><label>N° Auto</label><input type="text" id="a-nauto" placeholder="Ej: US1234"></div>
+    </div>
+    <div class="field"><label>Versión</label><input type="text" id="a-version" placeholder="Ej: 1.5 BENC 4X4 AUT"></div>
+    <div class="field-row">
+      <div class="field"><label>Repisa</label><input type="text" id="a-repisa" placeholder="Ej: R5-G"></div>
+      <div class="field"><label>Precio</label><input type="text" id="a-precio" placeholder="Ej: 150000"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('modal-add')">Cancelar</button>
+      <button class="mbtn mbtn-green" id="add-save-btn" onclick="saveAdd()">➕ Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDIT -->
+<div class="modal" id="modal-edit">
+  <div class="modal-box">
+    <div class="modal-title blue">✏️ Editar Repuesto</div>
+    <div class="field"><label>Repuesto *</label><input type="text" id="e-repuesto"></div>
+    <div class="field-row">
+      <div class="field"><label>Marca</label><input type="text" id="e-marca"></div>
+      <div class="field"><label>Modelo</label><input type="text" id="e-modelo"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Año</label><input type="text" id="e-anio"></div>
+      <div class="field"><label>N° Auto</label><input type="text" id="e-nauto"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('modal-edit')">Cancelar</button>
+      <button class="mbtn mbtn-blue" id="edit-save-btn" onclick="saveEdit()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SOLD CONFIRM -->
+<div class="modal" id="modal-sold">
+  <div class="modal-box">
+    <div class="modal-title red">🔴 Marcar como Vendido</div>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:8px;">Este repuesto se moverá a la pestaña Vendidos y quedará registrado en el historial.</p>
+    <div class="sold-preview" id="sold-preview-text">—</div>
+    <div class="field"><label>Precio de venta (opcional)</label><input type="number" id="sold-precio" placeholder="Ej: 85000"></div>
+    <div class="field"><label>Observación (opcional)</label><input type="text" id="sold-obs" placeholder="Ej: Vendido a taller Los Andes"></div>
+    <div class="modal-actions">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('modal-sold')">Cancelar</button>
+      <button class="mbtn mbtn-red" id="sold-confirm-btn" onclick="confirmSold()">✅ Confirmar Venta</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: HISTORY -->
+<div class="modal" id="modal-history">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-title amber">📋 Historial de Ventas</div>
+    <div class="tab-bar-inner">
+      <button class="tab-btn-sm active" id="htab-hoy" onclick="setHistoryTab('hoy')">Hoy</button>
+      <button class="tab-btn-sm" id="htab-semana" onclick="setHistoryTab('semana')">Esta semana</button>
+      <button class="tab-btn-sm" id="htab-todo" onclick="setHistoryTab('todo')">Todo</button>
+    </div>
+    <div class="history-list" id="history-list"></div>
+    <div class="modal-actions" style="margin-top:14px;">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('modal-history')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: IMPORT -->
+<div class="modal" id="modal-import">
+  <div class="modal-box" style="max-width:520px;">
+    <div class="modal-title blue">📂 Importar Excel</div>
+    <p style="color:var(--muted);font-size:0.82rem;margin-bottom:14px;">Sube un archivo .xlsx con columnas: <strong style="color:var(--text)">REPUESTO, MARCA, MODELO, AÑO, N° AUTO, VERSION, REPISA, PRECIO</strong>. Los duplicados se omiten automáticamente.</p>
+    <div class="import-drop" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="onDragOver(event)" ondrop="onDrop(event)" ondragleave="onDragLeave()">
+      <div class="drop-icon">📄</div>
+      <p><strong>Haz clic o arrastra aquí</strong></p>
+      <p style="margin-top:4px;">Archivos .xlsx — también desde el celular</p>
+    </div>
+    <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none" onchange="handleFile(this.files[0])">
+    <div class="import-preview" id="import-preview"></div>
+    <div class="import-progress" id="import-progress"><div class="import-bar" id="import-bar"></div></div>
+    <div class="import-status" id="import-status"></div>
+    <div class="modal-actions">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('modal-import')">Cancelar</button>
+      <button class="mbtn mbtn-blue" id="import-btn" onclick="doImport()" disabled style="opacity:0.4">📤 Importar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+var SB  = "https://ihxcmkjibtfpybvuuucf.supabase.co";
+var KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImloeGNta2ppYnRmcHlidnV1dWNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDI3MzMsImV4cCI6MjA5MzQ3ODczM30.A9sxW0TWNU-t4Y15ty5PWDQlJHf_FJANzQPCozhBk5U";
+
+var F1 = "DISPONIBLE EN STOCK!!!\n\nEN DESARMADURIA ALTAGAMA REPUESTOS\nREPUESTOS USADOS GARANTIZADOS\n\nCOTIZA CON NOSOTROS , EMPRESA REGISTRADA CONFIABLE CON LOCAL ESTABLECIDO.\n\nESTAMOS EN AV 10 DE JULIO #1064\nDESARMADURIA ALTAGAMA REPUESTOS\n\nCOTIZACION INMEDIATA +56950074136\nwww.altagamarepuestos.cl\n\n#repuestosautos #desarmaduria #bmw #jeep #audi #dodge #ford #mini #volvo #infiniti #lexus #porsche #mercedes_benz #honda #chrysler #renault #opel #land_rover #volkswagen #desarmaduria10dejulio #repuestos";
+var F2 = "DISPONIBLE EN STOCK!!!\n\nEN DESARMADURIA ALTAGAMA REPUESTOS\nREPUESTOS USADOS GARANTIZADOS\n\nCOTIZA CON NOSOTROS , EMPRESA REGISTRADA CONFIABLE CON LOCAL ESTABLECIDO.\n\nESTAMOS EN AV 10 DE JULIO #1064\nDESARMADURIA ALTAGAMA REPUESTOS\n\nCOTIZACION INMEDIATA +56950080120\nwww.altagamarepuestos.cl\n\n#repuestosautos #desarmaduria #bmw #jeep #audi #dodge #ford #mini #volvo #infiniti #lexus #porsche #mercedes_benz #honda #chrysler #renault #opel #land_rover #volkswagen #desarmaduria10dejulio #repuestos";
+
+// STATE
+var ALL_AVAILABLE = [], ALL_SOLD = [], ALL_PUBLISHED = [];
+var LABELS_AVAILABLE = [], LABELS_SOLD = [], LABELS_PUBLISHED = [];
+var currentTab = 'disponibles';
+var editId = null, pendingSoldId = null;
+var importRows = [];
+var historyTab = 'hoy';
+
+function apiHeaders(extra) {
+  return Object.assign({'apikey':KEY,'Authorization':'Bearer '+KEY}, extra||{});
+}
+
+// ── LOAD ──────────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    // Available (disponible=true, publicado=false or null)
+    var avail = await fetchAll('/rest/v1/repuestos?disponible=eq.true&publicado=eq.false&select=id,repuesto,marca,modelo,anio,n_auto&order=repuesto.asc');
+    // Also grab disponible=true with no publicado column set (null)
+    var availNull = await fetchAll('/rest/v1/repuestos?disponible=eq.true&publicado=is.null&select=id,repuesto,marca,modelo,anio,n_auto&order=repuesto.asc');
+    // Published
+    var pub = await fetchAll('/rest/v1/repuestos?disponible=eq.true&publicado=eq.true&select=id,repuesto,marca,modelo,anio,n_auto&order=repuesto.asc');
+    // Sold
+    var sold = await fetchAll('/rest/v1/repuestos?disponible=eq.false&select=id,repuesto,marca,modelo,anio,n_auto,fecha_venta&order=id.desc&limit=200');
+
+    ALL_AVAILABLE = avail.concat(availNull);
+    LABELS_AVAILABLE = ALL_AVAILABLE.map(makeLabel);
+    ALL_PUBLISHED = pub;
+    LABELS_PUBLISHED = ALL_PUBLISHED.map(makeLabel);
+    ALL_SOLD = sold;
+    LABELS_SOLD = ALL_SOLD.map(makeLabel);
+
+    document.getElementById('loading').style.display = 'none';
+    updateBadges();
+    renderTab();
+    loadSoldToday();
+  } catch(e) {
+    document.getElementById('loading').innerHTML = '⚠ Error al cargar. Revisa la conexión.';
+  }
+}
+
+async function fetchAll(path) {
+  var all = [], from = 0;
+  while (true) {
+    var sep = path.indexOf('?') >= 0 ? '&' : '?';
+    var r = await fetch(SB + path + sep + 'limit=1000&offset=' + from, {headers: apiHeaders()});
+    var d = await r.json();
+    if (!Array.isArray(d) || !d.length) break;
+    all = all.concat(d);
+    if (d.length < 1000) break;
+    from += 1000;
+  }
+  return all;
+}
+
+async function loadSoldToday() {
+  try {
+    var today = new Date().toISOString().slice(0,10);
+    var r = await fetch(SB+'/rest/v1/ventas?fecha_venta=gte.'+today+'T00:00:00&select=id', {headers: apiHeaders()});
+    var d = await r.json();
+    document.getElementById('st-sold-today').textContent = Array.isArray(d) ? d.length : '—';
+  } catch(e) {}
+}
+
+function makeLabel(item) {
+  return [item.repuesto, item.marca, item.modelo, item.anio, item.n_auto].filter(Boolean).join(' ');
+}
+
+function updateBadges() {
+  document.getElementById('badge-disponibles').textContent = ALL_AVAILABLE.length;
+  document.getElementById('badge-publicados').textContent = ALL_PUBLISHED.length;
+  document.getElementById('badge-vendidos').textContent = ALL_SOLD.length;
+  document.getElementById('st-available').textContent = ALL_AVAILABLE.length;
+  document.getElementById('st-published').textContent = ALL_PUBLISHED.length;
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function setTab(tab) {
+  currentTab = tab;
+  ['disponibles','publicados','vendidos'].forEach(function(t) {
+    document.getElementById('tab-'+t).classList.toggle('active', t === tab);
+  });
+  document.getElementById('search').value = '';
+  renderTab();
+}
+
+function renderTab() {
+  if (currentTab === 'disponibles') renderCards(ALL_AVAILABLE, LABELS_AVAILABLE, 'available');
+  else if (currentTab === 'publicados') renderCards(ALL_PUBLISHED, LABELS_PUBLISHED, 'published');
+  else renderCards(ALL_SOLD, LABELS_SOLD, 'sold');
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderCards(items, labels, tipo) {
+  var html = '';
+  items.forEach(function(item, idx) {
+    var le = esc(labels[idx]);
+    var badgeHtml = tipo === 'available'
+      ? '<span class="card-status-badge badge-available">Disponible</span>'
+      : tipo === 'published'
+      ? '<span class="card-status-badge badge-published">Publicado</span>'
+      : '<span class="card-status-badge badge-sold">Vendido</span>';
+
+    var buttons = '';
+    if (tipo === 'available') {
+      buttons = '<div class="btn-group">'
+        + '<button class="abtn abtn-blue" onclick="cp(this,\''+esc(labels[idx])+'\',0)">🚗 Repuesto</button>'
+        + '<button class="abtn abtn-gold" onclick="cp(this,\''+esc(labels[idx])+'\',1)">📢 4136</button>'
+        + '<button class="abtn abtn-purple" onclick="cp(this,\''+esc(labels[idx])+'\',2)">📢 0120</button>'
+        + '<button class="abtn abtn-pub" onclick="togglePublish('+item.id+',true)">📢 Publicar</button>'
+        + '<button class="abtn abtn-edit" onclick="openEdit('+item.id+',\'available\')">✏️ Editar</button>'
+        + '<button class="abtn abtn-sold" onclick="openSold('+item.id+')">🔴 Vendido</button>'
+        + '</div>';
+    } else if (tipo === 'published') {
+      buttons = '<div class="btn-group">'
+        + '<button class="abtn abtn-blue" onclick="cp(this,\''+esc(labels[idx])+'\',0)">🚗 Repuesto</button>'
+        + '<button class="abtn abtn-gold" onclick="cp(this,\''+esc(labels[idx])+'\',1)">📢 4136</button>'
+        + '<button class="abtn abtn-purple" onclick="cp(this,\''+esc(labels[idx])+'\',2)">📢 0120</button>'
+        + '<button class="abtn abtn-unpub" onclick="togglePublish('+item.id+',false)">↩ Quitar pub.</button>'
+        + '<button class="abtn abtn-edit" onclick="openEdit('+item.id+',\'published\')">✏️ Editar</button>'
+        + '<button class="abtn abtn-sold" onclick="openSold('+item.id+')">🔴 Vendido</button>'
+        + '</div>';
+    } else {
+      // sold — solo info
+      buttons = '';
+    }
+
+    html += '<div class="card card-'+tipo+'">'
+      + '<div class="card-header">'
+      + '<span class="card-text">'+le+'</span>'
+      + badgeHtml
+      + '</div>'
+      + buttons
+      + '</div>';
+  });
+
+  document.getElementById('grid').innerHTML = html;
+  var cnt = items.length;
+  document.getElementById('count').textContent = cnt + ' repuestos';
+  document.getElementById('empty').classList.toggle('hidden', cnt > 0);
+}
+
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;');
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+function filterCards() {
+  var raw = document.getElementById('search').value.toLowerCase().trim();
+  var words = raw ? raw.split(' ').filter(function(w){ return w; }) : [];
+  var cards = document.querySelectorAll('.card');
+  var visible = 0;
+  var labels = currentTab === 'disponibles' ? LABELS_AVAILABLE : currentTab === 'publicados' ? LABELS_PUBLISHED : LABELS_SOLD;
+  cards.forEach(function(c, i) {
+    if (!labels[i]) { c.classList.add('hidden'); return; }
+    var text = labels[i].toLowerCase();
+    var match = !words.length || words.every(function(w){ return text.indexOf(w) >= 0; });
+    c.classList.toggle('hidden', !match);
+    if (match) {
+      visible++;
+      var ct = c.querySelector('.card-text');
+      if (words.length) {
+        var hl = labels[i];
+        words.forEach(function(w) {
+          var i2 = 0, res = '', lo = hl.toLowerCase();
+          while (i2 < hl.length) {
+            var f = lo.indexOf(w, i2);
+            if (f === -1) { res += hl.slice(i2); break; }
+            res += hl.slice(i2,f) + '<mark>' + hl.slice(f,f+w.length) + '</mark>';
+            i2 = f + w.length;
+          }
+          hl = res;
+        });
+        ct.innerHTML = hl;
+      } else { ct.textContent = labels[i]; }
+    }
+  });
+  document.getElementById('count').textContent = visible + ' repuestos encontrados';
+  document.getElementById('empty').classList.toggle('hidden', visible > 0);
+}
+
+// ── COPY ──────────────────────────────────────────────────────────────────────
+function cp(btn, label, tipo) {
+  var text = tipo === 0 ? label : (tipo === 1 ? label+'\n\n'+F1 : label+'\n\n'+F2);
+  var orig = btn.textContent;
+  function done() { btn.textContent='✅'; btn.classList.add('ok'); setTimeout(function(){ btn.textContent=orig; btn.classList.remove('ok'); },1800); }
+  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text); done(); }); }
+  else { fallbackCopy(text); done(); }
+}
+function fallbackCopy(t) {
+  var ta=document.createElement('textarea'); ta.value=t; ta.style.cssText='position:fixed;opacity:0';
+  document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+}
+
+// ── PUBLISH TOGGLE ────────────────────────────────────────────────────────────
+async function togglePublish(id, pub) {
+  var r = await fetch(SB+'/rest/v1/repuestos?id=eq.'+id, {
+    method: 'PATCH',
+    headers: apiHeaders({'Content-Type':'application/json','Prefer':'return=minimal'}),
+    body: JSON.stringify({publicado: pub})
+  });
+  if (r.ok) {
+    // Move item between arrays
+    if (pub) {
+      var idx = ALL_AVAILABLE.findIndex(function(x){ return x.id===id; });
+      if (idx >= 0) {
+        var item = ALL_AVAILABLE.splice(idx,1)[0];
+        LABELS_AVAILABLE.splice(idx,1);
+        ALL_PUBLISHED.push(item);
+        LABELS_PUBLISHED.push(makeLabel(item));
+      }
+      toast('📢 Marcado como publicado');
+    } else {
+      var idx2 = ALL_PUBLISHED.findIndex(function(x){ return x.id===id; });
+      if (idx2 >= 0) {
+        var item2 = ALL_PUBLISHED.splice(idx2,1)[0];
+        LABELS_PUBLISHED.splice(idx2,1);
+        ALL_AVAILABLE.push(item2);
+        LABELS_AVAILABLE.push(makeLabel(item2));
+      }
+      toast('↩ Quitado de publicados');
+    }
+    updateBadges(); renderTab();
+  } else { toast('Error al actualizar', true); }
+}
+
+// ── ADD ───────────────────────────────────────────────────────────────────────
+function openAdd() {
+  ['a-repuesto','a-marca','a-modelo','a-anio','a-nauto','a-version','a-repisa','a-precio'].forEach(function(id){ document.getElementById(id).value=''; });
+  openModal('modal-add');
+  setTimeout(function(){ document.getElementById('a-repuesto').focus(); },150);
+}
+async function saveAdd() {
+  var rep=document.getElementById('a-repuesto').value.trim().toUpperCase();
+  var marca=document.getElementById('a-marca').value.trim().toUpperCase();
+  var modelo=document.getElementById('a-modelo').value.trim().toUpperCase();
+  if (!rep||!marca||!modelo) { toast('Repuesto, marca y modelo son obligatorios',true); return; }
+  var maxId = Math.max.apply(null, ALL_AVAILABLE.concat(ALL_PUBLISHED).concat(ALL_SOLD).map(function(x){ return x.id||0; }).concat([0]));
+  var nd = { id:maxId+1, repuesto:rep, marca:marca, modelo:modelo, anio:document.getElementById('a-anio').value.trim(), n_auto:document.getElementById('a-nauto').value.trim().toUpperCase(), version:document.getElementById('a-version').value.trim().toUpperCase(), repisa:document.getElementById('a-repisa').value.trim().toUpperCase(), precio:document.getElementById('a-precio').value.trim(), disponible:true, cantidad:1, publicado:false };
+  var btn=document.getElementById('add-save-btn'); btn.textContent='Agregando...'; btn.disabled=true;
+  var r=await fetch(SB+'/rest/v1/repuestos',{method:'POST',headers:apiHeaders({'Content-Type':'application/json','Prefer':'return=minimal'}),body:JSON.stringify(nd)});
+  btn.textContent='➕ Agregar'; btn.disabled=false;
+  if (r.ok) { ALL_AVAILABLE.push(nd); LABELS_AVAILABLE.push(makeLabel(nd)); updateBadges(); closeModal('modal-add'); setTab('disponibles'); toast('✅ Repuesto agregado'); }
+  else { toast('Error al agregar',true); }
+}
+
+// ── EDIT ──────────────────────────────────────────────────────────────────────
+function openEdit(id, source) {
+  var arr = source==='published' ? ALL_PUBLISHED : ALL_AVAILABLE;
+  var item = arr.find(function(x){ return x.id===id; });
+  if (!item) return;
+  editId = id;
+  document.getElementById('e-repuesto').value=item.repuesto||'';
+  document.getElementById('e-marca').value=item.marca||'';
+  document.getElementById('e-modelo').value=item.modelo||'';
+  document.getElementById('e-anio').value=item.anio||'';
+  document.getElementById('e-nauto').value=item.n_auto||'';
+  openModal('modal-edit');
+}
+async function saveEdit() {
+  if (!editId) return;
+  var nd={repuesto:document.getElementById('e-repuesto').value.trim().toUpperCase(),marca:document.getElementById('e-marca').value.trim().toUpperCase(),modelo:document.getElementById('e-modelo').value.trim().toUpperCase(),anio:document.getElementById('e-anio').value.trim(),n_auto:document.getElementById('e-nauto').value.trim().toUpperCase()};
+  if (!nd.repuesto) { toast('El repuesto es obligatorio',true); return; }
+  var btn=document.getElementById('edit-save-btn'); btn.textContent='Guardando...'; btn.disabled=true;
+  var r=await fetch(SB+'/rest/v1/repuestos?id=eq.'+editId,{method:'PATCH',headers:apiHeaders({'Content-Type':'application/json','Prefer':'return=minimal'}),body:JSON.stringify(nd)});
+  btn.textContent='💾 Guardar'; btn.disabled=false;
+  if (r.ok) {
+    [ALL_AVAILABLE, ALL_PUBLISHED].forEach(function(arr, ai) {
+      var item=arr.find(function(x){ return x.id===editId; });
+      if (item) { Object.assign(item,nd); var li=ai===0?LABELS_AVAILABLE:LABELS_PUBLISHED; li[arr.indexOf(item)]=makeLabel(item); }
+    });
+    closeModal('modal-edit'); renderTab(); filterCards(); toast('✅ Actualizado');
+  } else { toast('Error al guardar',true); }
+}
+
+// ── SOLD ──────────────────────────────────────────────────────────────────────
+function openSold(id) {
+  var item = ALL_AVAILABLE.concat(ALL_PUBLISHED).find(function(x){ return x.id===id; });
+  if (!item) return;
+  pendingSoldId = id;
+  document.getElementById('sold-preview-text').textContent = makeLabel(item);
+  document.getElementById('sold-precio').value='';
+  document.getElementById('sold-obs').value='';
+  openModal('modal-sold');
+}
+async function confirmSold() {
+  if (!pendingSoldId) return;
+  var item = ALL_AVAILABLE.concat(ALL_PUBLISHED).find(function(x){ return x.id===pendingSoldId; });
+  if (!item) return;
+  var btn=document.getElementById('sold-confirm-btn'); btn.textContent='Procesando...'; btn.disabled=true;
+  var precio=document.getElementById('sold-precio').value.trim();
+  var obs=document.getElementById('sold-obs').value.trim();
+  var ventaData={repuesto_id:item.id,repuesto:item.repuesto,marca:item.marca,modelo:item.modelo,anio:item.anio,n_auto:item.n_auto,label:makeLabel(item),fecha_venta:new Date().toISOString(),precio_venta:precio?parseInt(precio):null,observacion:obs||null};
+  await fetch(SB+'/rest/v1/ventas',{method:'POST',headers:apiHeaders({'Content-Type':'application/json','Prefer':'return=minimal'}),body:JSON.stringify(ventaData)});
+  var r=await fetch(SB+'/rest/v1/repuestos?id=eq.'+pendingSoldId,{method:'PATCH',headers:apiHeaders({'Content-Type':'application/json','Prefer':'return=minimal'}),body:JSON.stringify({disponible:false,cantidad:0,publicado:false})});
+  btn.textContent='✅ Confirmar Venta'; btn.disabled=false;
+  if (r.ok) {
+    var rmFromAvail=ALL_AVAILABLE.findIndex(function(x){ return x.id===pendingSoldId; });
+    var rmFromPub=ALL_PUBLISHED.findIndex(function(x){ return x.id===pendingSoldId; });
+    if (rmFromAvail>=0) { ALL_AVAILABLE.splice(rmFromAvail,1); LABELS_AVAILABLE.splice(rmFromAvail,1); }
+    if (rmFromPub>=0) { ALL_PUBLISHED.splice(rmFromPub,1); LABELS_PUBLISHED.splice(rmFromPub,1); }
+    ALL_SOLD.unshift(item); LABELS_SOLD.unshift(makeLabel(item));
+    closeModal('modal-sold'); updateBadges(); renderTab(); loadSoldToday();
+    toast('🔴 Repuesto marcado como vendido');
+  } else { toast('Error al procesar',true); }
+  pendingSoldId=null;
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────────────────
+async function openHistory() { openModal('modal-history'); await loadHistory(); }
+async function loadHistory() {
+  var list=document.getElementById('history-list');
+  list.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">Cargando...</div>';
+  try {
+    var r=await fetch(SB+'/rest/v1/ventas?select=id,label,fecha_venta,precio_venta,observacion&order=fecha_venta.desc&limit=300',{headers:apiHeaders()});
+    var data=await r.json();
+    if (!Array.isArray(data)) { list.innerHTML='<div class="history-empty">Sin registros</div>'; return; }
+    var now=new Date(), todayStr=now.toISOString().slice(0,10), weekAgo=new Date(now-7*24*60*60*1000);
+    var filtered=data.filter(function(v){
+      if (!v.fecha_venta) return historyTab==='todo';
+      var d=new Date(v.fecha_venta);
+      if (historyTab==='hoy') return v.fecha_venta.startsWith(todayStr);
+      if (historyTab==='semana') return d>=weekAgo;
+      return true;
+    });
+    if (!filtered.length) { list.innerHTML='<div class="history-empty">Sin ventas en este período</div>'; return; }
+    list.innerHTML=filtered.map(function(v){
+      var fecha=v.fecha_venta?new Date(v.fecha_venta).toLocaleString('es-CL'):'—';
+      var precio=v.precio_venta?'$'+Number(v.precio_venta).toLocaleString('es-CL'):'';
+      return '<div class="history-item">'
+        +'<div class="history-item-name">'+esc(v.label||'—')+'</div>'
+        +'<div class="history-item-meta"><span>📅 '+fecha+'</span>'+(precio?'<span>💰 '+precio+'</span>':'')+(v.observacion?'<span>📝 '+esc(v.observacion)+'</span>':'')+'</div>'
+        +'</div>';
+    }).join('');
+  } catch(e) { list.innerHTML='<div class="history-empty">Error al cargar</div>'; }
+}
+function setHistoryTab(tab) {
+  historyTab=tab;
+  ['hoy','semana','todo'].forEach(function(t){ document.getElementById('htab-'+t).classList.toggle('active',t===tab); });
+  loadHistory();
+}
+
+// ── IMPORT ────────────────────────────────────────────────────────────────────
+function openImport() {
+  importRows=[];
+  document.getElementById('import-preview').classList.remove('show');
+  document.getElementById('import-progress').classList.remove('show');
+  document.getElementById('import-status').textContent='';
+  document.getElementById('import-btn').disabled=true;
+  document.getElementById('import-btn').style.opacity='0.4';
+  document.getElementById('file-input').value='';
+  openModal('modal-import');
+}
+function onDragOver(e){ e.preventDefault(); document.getElementById('drop-zone').classList.add('drag'); }
+function onDragLeave(){ document.getElementById('drop-zone').classList.remove('drag'); }
+function onDrop(e){ e.preventDefault(); document.getElementById('drop-zone').classList.remove('drag'); var f=e.dataTransfer.files[0]; if(f) handleFile(f); }
+function handleFile(file) {
+  if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try {
+      var wb=XLSX.read(e.target.result,{type:'array'});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(!rows.length){ toast('El archivo está vacío',true); return; }
+      importRows=rows.map(function(row){
+        var norm={};
+        Object.keys(row).forEach(function(k){ norm[k.toUpperCase().trim()]=(row[k]+'').trim().toUpperCase(); });
+        return { repuesto:norm['REPUESTO']||norm['TIPO']||norm['PIEZA']||'', marca:norm['MARCA']||'', modelo:norm['MODELO']||'', anio:norm['AÑO']||norm['ANO']||norm['ANIO']||'', n_auto:norm['N° AUTO']||norm['N AUTO']||norm['NAUTO']||norm['N_AUTO']||'', version:norm['VERSION']||norm['VERSIÓN']||'', repisa:norm['REPISA']||'', precio:norm['PRECIO']||'' };
+      }).filter(function(r){ return r.repuesto&&r.marca&&r.modelo; });
+      if(!importRows.length){ toast('No se encontraron filas válidas. Verifica las columnas.',true); return; }
+      var preview=document.getElementById('import-preview');
+      preview.innerHTML='<strong style="color:var(--text)">'+importRows.length+' registros detectados:</strong><br><br>'
+        +importRows.slice(0,8).map(function(r){ return '<div class="row">'+[r.repuesto,r.marca,r.modelo,r.anio,r.n_auto].filter(Boolean).join(' · ')+'</div>'; }).join('')
+        +(importRows.length>8?'<div class="row" style="color:var(--muted)">...y '+(importRows.length-8)+' más</div>':'');
+      preview.classList.add('show');
+      document.getElementById('import-btn').disabled=false;
+      document.getElementById('import-btn').style.opacity='1';
+      document.getElementById('import-status').textContent='Listo para importar '+importRows.length+' registros';
+    } catch(err){ toast('Error leyendo el archivo Excel',true); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+async function doImport() {
+  if(!importRows.length) return;
+  var btn=document.getElementById('import-btn'); btn.disabled=true; btn.textContent='Importando...';
+  var progress=document.getElementById('import-progress'), bar=document.getElementById('import-bar'), status=document.getElementById('import-status');
+  progress.classList.add('show');
+  var allExisting=ALL_AVAILABLE.concat(ALL_PUBLISHED).concat(ALL_SOLD);
+  var maxId=allExisting.length?Math.max.apply(null,allExisting.map(function(x){ return x.id||0; })):0;
+  var existing=new Set(ALL_AVAILABLE.concat(ALL_PUBLISHED).map(makeLabel).map(function(l){ return l.toLowerCase(); }));
+  var toInsert=importRows.filter(function(r){ var label=[r.repuesto,r.marca,r.modelo,r.anio,r.n_auto].filter(Boolean).join(' ').toLowerCase(); return !existing.has(label); });
+  if(!toInsert.length){ toast('Todos los registros ya existen',true); btn.disabled=false; btn.textContent='📤 Importar'; return; }
+  var BATCH=50, inserted=0, errors=0;
+  for(var i=0;i<toInsert.length;i+=BATCH){
+    var batch=toInsert.slice(i,i+BATCH).map(function(r,j){ return {id:maxId+inserted+j+1,repuesto:r.repuesto,marca:r.marca,modelo:r.modelo,anio:r.anio,n_auto:r.n_auto,version:r.version,repisa:r.repisa,precio:r.precio,disponible:true,cantidad:1,publicado:false}; });
+    var r=await fetch(SB+'/rest/v1/repuestos',{method:'POST',headers:apiHeaders({'Content-Type':'application/json','Prefer':'return=minimal'}),body:JSON.stringify(batch)});
+    if(r.ok){ batch.forEach(function(nd){ ALL_AVAILABLE.push(nd); LABELS_AVAILABLE.push(makeLabel(nd)); }); inserted+=batch.length; }
+    else{ errors+=batch.length; }
+    bar.style.width=Math.min(Math.round(((i+BATCH)/toInsert.length)*100),100)+'%';
+    status.textContent='Subiendo... '+Math.min(i+BATCH,toInsert.length)+' / '+toInsert.length;
+    maxId+=batch.length;
+  }
+  btn.textContent='📤 Importar'; btn.disabled=false;
+  updateBadges();
+  if(!errors){ closeModal('modal-import'); setTab('disponibles'); toast('✅ '+inserted+' repuestos importados'); }
+  else{ toast('Importados: '+inserted+' | Errores: '+errors,errors>0); }
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal').forEach(function(m){ m.addEventListener('click',function(e){ if(e.target===m) m.classList.remove('open'); }); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') document.querySelectorAll('.modal.open').forEach(function(m){ m.classList.remove('open'); }); });
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg,err){ var t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(err?' err':''); clearTimeout(t._t); t._t=setTimeout(function(){ t.classList.remove('show'); },3000); }
+
+loadData();
+</script>
+</body>
+</html>
